@@ -1,0 +1,94 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Hesap Makinesi Uygulaması</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        .calculator {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        input, select, button {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 16px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>Hesap Makinesi</h2>
+        <form id="calcForm">
+            <input type="number" id="number1" placeholder="Sayı 1" required step="any">
+            <input type="number" id="number2" placeholder="Sayı 2" required step="any">
+            <select id="operation">
+                <option value="+">Toplama (+)</option>
+                <option value="-">Çıkarma (-)</option>
+                <option value="*">Çarpma (*)</option>
+                <option value="/">Bölme (/)</option>
+            </select>
+            <button type="submit">Hesapla</button>
+        </form>
+        <div class="result" id="result"></div>
+        <div class="error" id="error"></div>
+    </div>
+    <script>
+        document.getElementById('calcForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            document.getElementById('result').textContent = '';
+            document.getElementById('error').textContent = '';
+            const number1 = parseFloat(document.getElementById('number1').value);
+            const number2 = parseFloat(document.getElementById('number2').value);
+            const operation = document.getElementById('operation').value;
+
+            try {
+                const response = await fetch('http://localhost:8000/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number1, number2, operation })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').textContent = 'Sonuç: ' + data["İşlem Sonucu"];
+                } else {
+                    document.getElementById('error').textContent = data.detail || 'Bir hata oluştu!';
+                }
+            } catch (err) {
+                document.getElementById('error').textContent = 'Sunucuya ulaşılamıyor!';
+            }
+        });
+    </script>
+</body>
+</html>
